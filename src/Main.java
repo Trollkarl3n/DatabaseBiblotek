@@ -38,10 +38,11 @@ public class Main {
                 System.out.println("4. Låna bok");
                 System.out.println("5. Låna media");
                 System.out.println("6. Lämna tillbaka");
-                System.out.println("7. Uppdatera din profil");
-                System.out.println("8. Logga ut");
+                System.out.println("7. Lånestatus");
+                System.out.println("8. Uppdatera din profil");
+                System.out.println("9. Logga ut");
             }
-            System.out.println("9. Avsluta");
+            System.out.println("10. Avsluta");
 
             input = scanner.nextLine();
 
@@ -74,15 +75,20 @@ public class Main {
                     returnMedia(connection, scanner);
                     break;
                 case "7":
+                    System.out.println("Lånestatus");
+                    viewBorrowedBooks(connection);
+                    viewBorrowedMedia(connection);
+                    break;
+                case "8":
                     System.out.println("Uppdatera din profil");
                     updateProfile(connection, scanner);
                     break;
-                case "8":
+                case "9":
                     System.out.println("Logga ut");
                     logOut();
                     break;
             }
-        } while (!input.equals("9"));
+        } while (!input.equals("10"));
         System.out.println("Programmet avslutades");
     }
 
@@ -284,6 +290,7 @@ public class Main {
             } else {
                 System.out.println("Du har inte lånat boken med id " + bookId + ".");
             }
+            viewBorrowedBooks(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -366,6 +373,7 @@ public class Main {
             } else {
                 System.out.println("Du har inte lånat media med id " + mediaId + ".");
             }
+            viewBorrowedMedia(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -495,6 +503,73 @@ public class Main {
                 System.out.println("E-postadressen har uppdaterats.");
             } else {
                 System.out.println("Tyvärr, något gick fel vid uppdatering av e-postadressen.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    private static void viewBorrowedBooks(Connection connection) {
+        try {
+            // Prepare the SQL statement to get borrowed books for the logged-in user
+            String sql = "SELECT Books.title AS item_title, Loans.loan_date, Loans.due_date " +
+                    "FROM Books " +
+                    "JOIN Loans ON Books.book_id = Loans.book_id " +
+                    "WHERE Loans.user_id = ? AND Loans.return_date IS NULL";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, loggedInUserId);
+
+            // Execute the query
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Display the borrowed books
+            if (resultSet.next()) {
+                System.out.println("Dina lånade böcker:");
+                do {
+                    String title = resultSet.getString("item_title");
+                    String loanDate = resultSet.getString("loan_date");
+                    String dueDate = resultSet.getString("due_date");
+
+                    System.out.println("Titel: " + title);
+                    System.out.println("Lånedatum: " + loanDate);
+                    System.out.println("Förfallodatum: " + dueDate);
+                    System.out.println();
+                } while (resultSet.next());
+            } else {
+                System.out.println("Du har inga lånade böcker för närvarande.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void viewBorrowedMedia(Connection connection) {
+        try {
+            // Prepare the SQL statement to get borrowed media for the logged-in user
+            String sql = "SELECT Media.title AS item_title, LoansMedia.loan_date, LoansMedia.due_date " +
+                    "FROM Media " +
+                    "JOIN LoansMedia ON Media.media_id = LoansMedia.media_id " +
+                    "WHERE LoansMedia.user_id = ? AND LoansMedia.return_date IS NULL";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, loggedInUserId);
+
+            // Execute the query
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Display the borrowed media
+            if (resultSet.next()) {
+                System.out.println("Dina lånade media:");
+                do {
+                    String title = resultSet.getString("item_title");
+                    String loanDate = resultSet.getString("loan_date");
+                    String dueDate = resultSet.getString("due_date");
+
+                    System.out.println("Titel: " + title);
+                    System.out.println("Lånedatum: " + loanDate);
+                    System.out.println("Förfallodatum: " + dueDate);
+                    System.out.println();
+                } while (resultSet.next());
+            } else {
+                System.out.println("Du har inga lånade media för närvarande.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

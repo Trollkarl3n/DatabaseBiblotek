@@ -519,7 +519,7 @@ public class Main {
     }
     private static void viewBorrowedBooks(Connection connection) {
         try {
-            // Prepare the SQL statement to get borrowed books for the logged-in user
+            // Förbered SQL-frågan för att hämta lånade böcker för inloggad användare
             String sql = "SELECT Books.title AS item_title, Loans.loan_date, Loans.due_date " +
                     "FROM Books " +
                     "JOIN Loans ON Books.book_id = Loans.book_id " +
@@ -527,10 +527,10 @@ public class Main {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, loggedInUserId);
 
-            // Execute the query
+            // Exekvera frågan
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            // Display the borrowed books
+            // Visa de lånade böckerna
             if (resultSet.next()) {
                 System.out.println("Dina lånade böcker:");
                 do {
@@ -553,7 +553,7 @@ public class Main {
 
     private static void viewBorrowedMedia(Connection connection) {
         try {
-            // Prepare the SQL statement to get borrowed media for the logged-in user
+            // Förbered SQL-frågan för att hämta lånad media för inloggad användare
             String sql = "SELECT Media.title AS item_title, LoansMedia.loan_date, LoansMedia.due_date " +
                     "FROM Media " +
                     "JOIN LoansMedia ON Media.media_id = LoansMedia.media_id " +
@@ -561,10 +561,10 @@ public class Main {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, loggedInUserId);
 
-            // Execute the query
+            // Exekvera frågan
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            // Display the borrowed media
+            // Visa den lånade median
             if (resultSet.next()) {
                 System.out.println("Dina lånade media:");
                 do {

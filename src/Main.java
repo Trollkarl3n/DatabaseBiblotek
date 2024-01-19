@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.Scanner;
 
 public class Main {
@@ -236,10 +237,14 @@ public class Main {
                     int rowsAffected = borrowBook.executeUpdate();
 
                     if (rowsAffected > 0) {
-                        // Registrera lånet i Loans-tabellen
-                        PreparedStatement recordLoan = connection.prepareStatement("INSERT INTO Loans (user_id, book_id, loan_date) VALUES (?, ?, NOW())");
+                        // Beräkna förfallodatum (30 dagar från dagens datum)
+                        LocalDate dueDate = LocalDate.now().plusDays(30);
+
+                        // Registrera lånet i Loans-tabellen med förfallodatum
+                        PreparedStatement recordLoan = connection.prepareStatement("INSERT INTO Loans (user_id, book_id, loan_date, due_date) VALUES (?, ?, NOW(), ?)");
                         recordLoan.setInt(1, loggedInUserId);
                         recordLoan.setInt(2, bookId);
+                        recordLoan.setDate(3, Date.valueOf(dueDate));
                         recordLoan.executeUpdate();
 
                         System.out.println("Du har lånat boken. Glöm inte att lämna tillbaka i tid!");
@@ -318,10 +323,14 @@ public class Main {
                     int rowsAffected = borrowMedia.executeUpdate();
 
                     if (rowsAffected > 0) {
-                        // Registrera lånet i LoansMedia-tabellen
-                        PreparedStatement recordLoan = connection.prepareStatement("INSERT INTO LoansMedia (user_id, media_id, loan_date) VALUES (?, ?, NOW())");
+                        // Beräkna förfallodatum (10 dagar från dagens datum)
+                        LocalDate dueDate = LocalDate.now().plusDays(10);
+
+                        // Registrera lånet i LoansMedia-tabellen med förfallodatum
+                        PreparedStatement recordLoan = connection.prepareStatement("INSERT INTO LoansMedia (user_id, media_id, loan_date, due_date) VALUES (?, ?, NOW(), ?)");
                         recordLoan.setInt(1, loggedInUserId);
                         recordLoan.setInt(2, mediaId);
+                        recordLoan.setDate(3, Date.valueOf(dueDate));
                         recordLoan.executeUpdate();
 
                         System.out.println("Du har lånat media. Glöm inte att lämna tillbaka i tid!");
